@@ -1,0 +1,6 @@
+# The phone link key: the one shared secret between your phone and this link.
+# Create it in the app (Setup, step 3 "Phone link key", or Settings > Change key),
+# tap Copy, and paste it here when you are asked for it.
+# Both the phone and your website send this same value as the X-Api-Key header.
+# Never commit a real key. This file is only an example of the name.
+PHONE_API_KEY=paste-the-key-from-the-app-here

@@ -1,0 +1,16 @@
+{
+  "name": "ipo-archive-relay-worker",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Cloudflare Worker relay between a website and the MobileSqlDB phone app. Stores nothing.",
+  "scripts": {
+    "test": "node test/relay.test.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "4.131.1"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true,
+    "workerd@1.20260911.1": true
+  }
+}
