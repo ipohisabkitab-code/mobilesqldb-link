@@ -187,7 +187,9 @@ export class PhoneRelay extends DurableObject {
     if (!phoneSocket) {
       await drainBody(request, this.env);
       this.log(url.pathname, 503, Date.now() - start);
-      return jsonResponse({ status: "error", message: "Phone is offline" }, 503);
+      // sent:false -- the request never reached the phone, so the website may
+      // safely send it again once the phone is back (usually within seconds).
+      return jsonResponse({ status: "error", message: "Phone is offline", sent: false }, 503);
     }
 
     // Body is passed through as an opaque string -- never JSON.parse it here
@@ -210,7 +212,7 @@ export class PhoneRelay extends DurableObject {
       } catch (_err) {
         clearTimeout(timer);
         this.pending.delete(requestId);
-        resolve({ kind: "offline" });
+        resolve({ kind: "offline", sent: false });
       }
     });
 
@@ -221,7 +223,11 @@ export class PhoneRelay extends DurableObject {
     }
     if (result.kind === "offline") {
       this.log(url.pathname, 503, elapsed, requestId);
-      return jsonResponse({ status: "error", message: "Phone is offline" }, 503);
+      // Only a request that was never handed to the socket says sent:false. One
+      // that was sent and then lost its phone may already have run there.
+      const reply = { status: "error", message: "Phone is offline" };
+      if (result.sent === false) reply.sent = false;
+      return jsonResponse(reply, 503);
     }
     if (result.kind === "badReply") {
       this.log(url.pathname, 502, elapsed, requestId);

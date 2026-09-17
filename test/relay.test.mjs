@@ -340,6 +340,7 @@ async function runTestCases(wranglerState) {
     const json = await res.json();
     assert.equal(json.status, "error");
     assert.equal(json.message, "Phone is offline");
+    assert.equal(json.sent, false, "never reached a phone, so the website may send it again");
   });
 
   // --- c. /phone upgrade with wrong key -> rejected ---------------------
@@ -555,6 +556,7 @@ async function runTestCases(wranglerState) {
     assert.equal(res.status, 503);
     const json = await res.json();
     assert.equal(json.message, "Phone is offline");
+    assert.equal(json.sent, undefined, "it reached the phone and may have run there: not marked as safe to resend");
     assert.ok(
       elapsed < REPLY_TIMEOUT_MS - 200,
       `disconnect should fail fast (${elapsed}ms), well before the ${REPLY_TIMEOUT_MS}ms timeout`
